@@ -58,35 +58,17 @@ def generate_pw(min_length, numbers=True, special_chars=True):
             meets_req = True
     return pw
 
-def saveNewLogin():
-    account_name = input("Account Name: ").lower()
-    user_name = input("User Name: ")
-    email = input("Email: ")
-    password=""
-    while True:
-        try:
-            genPw = int(input("1: Generate new password\n2: Enter your own password"))
-            if genPw==1:
-                length = int(input("How long do you want your passowrd to be? "))
-                numbers = input("Would you like your password to include numbers? (y/n)")
-                special = input("Would you like your password to include special characters? (y/n)")
-                password=generate_pw(length, numbers=="y", special=="y")
-                break
-            if genPw==2:
-                password = input("Please enter your password: ")
-                break
-            else:
-                print("Invalid selection")
-        except:
-            print("The input you have selected is not valid")
-    new_record_data = (account_name, user_name, password, email)  # Replace with actual values
 
-    insert_query = f"INSERT INTO {table_name} (website_name, user_name, password, email) VALUES (?, ?, ?,?)"
-    cursor.execute(insert_query, new_record_data)
+column_name = 'website_name'
+account = input("Account to be delete: ").lower()
+query = f"SELECT * FROM {table_name} WHERE {column_name} = ?"
+cursor.execute(query, (account,))
+res = cursor.fetchone()
+if res==None:
+        print("That account does not exist!")
+else:
+    cursor.execute(f"DELETE FROM {table_name} WHERE {column_name} = ?", (account,))
     connection.commit()
-    print("New Login Saved!\n")
-
-saveNewLogin()
 
 #Commit command
 connection.commit()
