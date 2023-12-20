@@ -1,6 +1,48 @@
 import random
 import string
+import sqlite3
 
+connection = sqlite3.connect('password.db')
+
+cursor = connection.cursor()
+
+
+def displayLogins():
+    cursor.execute("SELECT * FROM logins")
+    logins = cursor.fetchall()
+    if len(logins)==0:
+        print("There are no saved logins!")
+    else:
+        print("Account Name\t|\tUsername\t|\tPassword\t|\tEmail")
+        print("-----------------------------------------------------------------------------------")
+        for login in logins:
+            row = ""
+            i=0
+            for item in login:
+                i=i+1
+                if i==1:
+                    row="\t   "+item
+                else:
+                    row+="\t\t"+item
+            print(row+"\n")
+
+def getLoginDetails():
+    table_name = 'logins'
+    column_name = 'website_name'
+    account = input("Enter the account name of the login details you would like to see: ")
+    query = f"SELECT * FROM {table_name} WHERE {column_name} = ?"
+    cursor.execute(query, (account,))
+    res = cursor.fetchone()
+    if res==None:
+            print("That account does not exist!")
+    else:
+        print("Account Name\t|\tUsername\t|\tPassword\t|\tEmail")
+        print("-----------------------------------------------------------------------------------")
+        row=""
+        for item in res:
+            row+="\t\t"+item
+        print(row)
+    
 def generate_pw(min_length, numbers=True, special_chars=True):
     letters = string.ascii_letters
     digits = string.digits
@@ -30,36 +72,44 @@ def generate_pw(min_length, numbers=True, special_chars=True):
             contains_special = True
         if contains_special and contains_number and len(pw)>=min_length:
             meets_req = True
-    print(pw)
-
-print("Main Menu\n")
-print("1: Generate New Password\n\n")
-boot = True
-while boot:
-    try:
-        num = int(input("What would you like to do?:"))
-        if num==1:
-            generate = True
-            while generate:
-                try:
-                    num = int(input("What is the length of the pw you would like to create?: "))
-                    number = input("Would you like your password to include numbers?(y/n): ")
-                    special = input("Would you like your password to include special characters?(y/n): ")
-                    req_number = False
-                    req_special = False
-                    if number == "y":
-                        req_number = True
-                    if special == "y":
-                        req_special = True
-                    generate_pw(num, req_number, req_special)
-                    generate = False
-                except ValueError:
-                    print("Invalid input. Please another option.")
-            boot = False
-    except ValueError:
-        print("Invalid input. Please enter an integer.")
+    return pw
 
 
+def main():    
+    boot = True
+    while boot:
+        print("Main Menu\n")
+        print("1: View All Logins\n")
+        print("2: Get Login Details\n")
+        print("3: Save A New Login\n")
+        print("4: Delete A Login\n")
+        print("5: Exit\n")
+        try:
+            num = int(input("What would you like to do?: "))
+            if num==1:
+                displayLogins()
+            if num==2:
+                getLoginDetails()
+            if num==3:
+                print("adfa")
+            if num==4:
+                print("fadsfa")
+            if num==5:
+                boot = False
+                break
+            goBack = input("Back to Main menu? (y/n)")
+            if goBack.lower()=="n":
+                boot=False
+        except ValueError:
+            print("\nInvalid input. Please try again\n")
+
+main()
 
 
+
+#Commit command
+connection.commit()
+
+#Close Connection
+connection.close()
 
