@@ -1,8 +1,14 @@
 import random
 import string
 import sqlite3
+import os
 
-connection = sqlite3.connect('password.db')
+# Get the path to the bundled database file
+db_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'password.db')
+
+# Use db_file_path in your database connection or operations
+
+connection = sqlite3.connect(db_file_path)
 
 cursor = connection.cursor()
 
@@ -43,7 +49,20 @@ def getLoginDetails():
         for item in res:
             row+="\t\t"+item
         print(row)
-    
+
+def deleteALogin():
+    column_name = 'website_name'
+    account = input("Account to be delete: ")
+    query = f"SELECT * FROM {table_name} WHERE {column_name} = ?"
+    cursor.execute(query, (account,))
+    res = cursor.fetchone()
+    if res==None:
+            print("That account does not exist!")
+    else:
+        cursor.execute(f"DELETE FROM {table_name} WHERE {column_name} = ?", (account,))
+        connection.commit()
+        print("Account deleted successfully!\n")
+
 def generate_pw(min_length, numbers=True, special_chars=True):
     letters = string.ascii_letters
     digits = string.digits
@@ -96,10 +115,8 @@ def saveNewLogin():
                 print("Invalid selection")
         except:
             print("The input you have selected is not valid")
-    new_record_data = (account_name, user_name, password, email)  # Replace with actual values
-
-    insert_query = f"INSERT INTO {table_name} (website_name, user_name, password, email) VALUES (?, ?, ?,?)"
-    cursor.execute(insert_query, new_record_data)
+    new_record_data = (account_name, user_name, password, email) 
+    cursor.execute(f"INSERT INTO {table_name} (website_name, user_name, password, email) VALUES (?, ?, ?,?)", new_record_data)
     connection.commit()
     print("New Login Saved!\n")
 
@@ -121,7 +138,7 @@ def main():
             if num==3:
                 saveNewLogin()
             if num==4:
-                print("fadsfa")
+                deleteALogin()
             if num==5:
                 boot = False
                 break
